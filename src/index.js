@@ -28,7 +28,14 @@ const createEffect = (fn) => {
   self();
 };
 
+const createMemo = (fn) => {
+  const [get, set] = createSignal();
+  createEffect(() => set(fn()));
+  return get;
+};
+
 export {
   createSignal,
-  createEffect
+  createEffect,
+  createMemo
 }

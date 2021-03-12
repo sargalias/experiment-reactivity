@@ -1,4 +1,4 @@
-import {createSignal, createEffect} from './index';
+import {createSignal, createEffect, createMemo} from './index';
 
 describe('reactivity', () => {
   test('effect should run on initialisation', () => {
@@ -43,5 +43,25 @@ describe('reactivity', () => {
     setFirstName('Alice');
     expect(nameSpy).toHaveBeenCalledTimes(2);
     expect(nameSpy).toHaveBeenCalledWith('Alice', 'Smith');
+  });
+
+  test('createMemo(fn) should return a getter for the value that fn() evaluates to', () => {
+    const fn = () => 5;
+    const get = createMemo(fn);
+    expect(get()).toBe(5);
+  });
+
+  test('createMemo(fn) should create a signal', () => {
+    const spy = jest.fn();
+    const [num1, setNum1] = createSignal(1);
+    const [num2] = createSignal(2);
+    const mathResult = createMemo(() => num1() + num2());
+    createEffect(() => spy(mathResult()));
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy).toHaveBeenCalledWith(3);
+
+    setNum1(4);
+    expect(spy).toHaveBeenCalledTimes(2);
+    expect(spy).toHaveBeenCalledWith(6);
   });
 });
